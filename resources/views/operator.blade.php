@@ -147,7 +147,7 @@
                     <div class="service-name" id="currentService"></div>
                 </div>
                 <div class="action-buttons">
-                    <button class="btn btn-call" onclick="panggilBerikutnya()">📢 Panggil Berikutnya</button>
+                    <button class="btn btn-call" id="btnPanggil" onclick="panggilBerikutnya()">📢 Panggil Berikutnya</button>
                     <div class="btn-row" id="activeActions" style="display:none;">
                         <button class="btn btn-recall" onclick="panggilUlang()">🔁 Panggil Ulang</button>
                         <button class="btn btn-skip" onclick="skipAntrian()">⏭ Skip</button>
@@ -276,6 +276,9 @@
             document.getElementById('currentService').textContent = antrian.layanan?.nama_layanan || '';
             document.getElementById('activeActions').style.display = 'grid';
             document.getElementById('finishBtn').style.display = 'block';
+            document.getElementById('btnPanggil').disabled = true;
+            document.getElementById('btnPanggil').style.opacity = '0.5';
+            renderQueue();
         }
 
         function clearCurrentCall() {
@@ -286,6 +289,9 @@
             document.getElementById('currentService').textContent = '';
             document.getElementById('activeActions').style.display = 'none';
             document.getElementById('finishBtn').style.display = 'none';
+            document.getElementById('btnPanggil').disabled = false;
+            document.getElementById('btnPanggil').style.opacity = '1';
+            renderQueue();
         }
 
         // Tabs
@@ -308,7 +314,8 @@
             list.innerHTML = items.map(item => {
                 const badgeClass = `q-badge-${item.status}`;
                 let actionBtn = '';
-                if (currentTab === 'pending' && (item.status === 'skip' || item.status === 'calling')) {
+                const hasActiveCalling = document.getElementById('btnPanggil').disabled;
+                if (currentTab === 'pending' && (item.status === 'skip' || item.status === 'waiting') && !hasActiveCalling) {
                     actionBtn = `<button class="btn btn-primary btn-sm q-action" onclick="panggilNomor(${item.id})">📢 Panggil</button>`;
                 }
                 return `

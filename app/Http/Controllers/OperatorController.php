@@ -68,11 +68,15 @@ class OperatorController extends Controller
 
     public function panggilBerikutnya(Loket $loket)
     {
-        // Selesaikan yang sedang dipanggil
-        Antrian::where('loket_id', $loket->id)
+        // Cek apakah masih ada yang sedang dipanggil
+        $masihCalling = Antrian::where('loket_id', $loket->id)
             ->where('status', 'calling')
             ->whereDate('created_at', today())
-            ->update(['status' => 'finished', 'finished_at' => now()]);
+            ->exists();
+
+        if ($masihCalling) {
+            return response()->json(['success' => false, 'message' => 'Selesaikan antrian yang sedang dipanggil terlebih dahulu.']);
+        }
 
         $layananIds = $loket->layanans->pluck('id')->toArray();
 
@@ -149,11 +153,15 @@ class OperatorController extends Controller
 
     public function panggilNomor(Loket $loket, Antrian $antrian)
     {
-        // Selesaikan yang sedang dipanggil
-        Antrian::where('loket_id', $loket->id)
+        // Cek apakah masih ada yang sedang dipanggil
+        $masihCalling = Antrian::where('loket_id', $loket->id)
             ->where('status', 'calling')
             ->whereDate('created_at', today())
-            ->update(['status' => 'finished', 'finished_at' => now()]);
+            ->exists();
+
+        if ($masihCalling) {
+            return response()->json(['success' => false, 'message' => 'Selesaikan antrian yang sedang dipanggil terlebih dahulu.']);
+        }
 
         $antrian->update([
             'status' => 'calling',
